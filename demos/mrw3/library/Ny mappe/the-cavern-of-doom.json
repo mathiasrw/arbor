@@ -1,0 +1,1 @@
+{"_id":"the-cavern-of-doom","_rev":"1-ddbdc0a05d3d10ab352850de46d2ef9a","sys":{"repulsion":2600,"friction":0.5,"stiffness":512,"gravity":true},"src":"{color:none}\n\n; choices\n2 -> 7\n7 -> 13\n7 -> 15\n7 -> 19\n7 -> 21\n13 -> 21","example":"cyoa","title":"The Cavern of Doom"}

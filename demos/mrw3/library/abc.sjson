@@ -1,0 +1,1 @@
+{"_id":"the-abominable-snowman","_rev":"1-cb224d9fc9d466d9e3cc358bbb410cbc","sys":{"repulsion":2600,"friction":0.5,"stiffness":512,"gravity":true},"src":" ; $gul = #FFE35F    \n;$gul=#FFE35F\n   ; MRW 2011 modifications\n\n{color:none}\n\n 1->2->3->4->5->6 \n3->9\n9 -> 20\n9 -> 15","example":"cyoa","title":"The Abominable Snowman"}
