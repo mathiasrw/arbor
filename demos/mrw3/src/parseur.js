@@ -148,12 +148,43 @@
       return {nodes:nodes, edges:edges}
     }
 
-	/* MRW 2011 */
-	var precompile = function(s){
 	
+	
+    var that = {
+      lechs:lechs,
+      yack:yack,
+	  precompile:precompile,
+      parse:function(s){
+	  try{
+        var lines = precompile(s).split('\n')
+	  } catch(e){
+		alert(e)
+	  }
+        var statements = []
+        $.each(lines, function(i,line){
+          var tokens = lechs(line)
+          if (tokens.length>0) statements.push(tokens)
+        })
+        
+        return yack(statements)
+      }
+    }
+    
+    return that
+  }
+
+  /* MRW 2011 */
+	var precompile = function(s){
+		
+		// Remove comments /* foo */
+		regexp = /\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\//gm;
+		while(s.match(regexp)){
+			s = s.replace(regexp, "")
+		}
+		
 		// Add constants as 
 		// ; $var 1 = val 1
-		// Hidden in comments to void compilation problems. 
+		// Hidden as ";" comments to void compilation problems. 
 		// Last value set to same constant will be the valid one
 		// The line "   ; $ hello yo = some crap code " will replace "$ hello yo" with "some crap code"
 		var regexp  = /\s*?;\s*?(\$.+?)\s*=\s*(.*?)\s*$/gm;
@@ -183,40 +214,30 @@
 			var re = new RegExp("\\"+replaceConfigOdered[i][1],"gi");
 			s = s.replace(re, replaceConfigOdered[i][2])
 		}
-		//alert(s)
+
+		// Expand chuncs
+		regexp = /(.*?){{(.*?),(.*?)}}(.*)$/gim;
+		while(s.match(regexp)){
+			//s = s.replace(regexp, "'$1' '$2' '$3' '$4'")
+			s = s.replace(regexp, "$1$2$4\n$1{{$3}}$4")
+		}
 		
+		// clean up last chunck
+		regexp = /{{(.*?)}}/gim;
+		while(s.match(regexp)){
+			s = s.replace(regexp, "$1")
+		}
+
 		// Add singleline notation of: a -> b -- c -> d
 		regexp = /(-[->])(.*?)(-[->])(.*)$/gim;
 		while(s.match(regexp)){
 			s = s.replace(regexp, "$1$2\n$2$3$4")
 		}
+		
+		//alert(s)
+
 		return s;
     }
-	
-    var that = {
-      lechs:lechs,
-      yack:yack,
-	  precompile:precompile,
-      parse:function(s){
-	  try{
-        var lines = precompile(s).split('\n')
-	  } catch(e){
-		alert(e)
-	  }
-        var statements = []
-        $.each(lines, function(i,line){
-          var tokens = lechs(line)
-          if (tokens.length>0) statements.push(tokens)
-        })
-        
-        return yack(statements)
-      }
-    }
-    
-    return that
-  }
-
-  
 
   
 })()
