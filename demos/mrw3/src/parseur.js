@@ -201,21 +201,28 @@
 			replaceConfig.push(replaceConfigLines[i].match(regexp2));
 		}
 		
-		for (i = 0; i<max; i++) {	//only latest setting of each variable
+		//only latest setting of each variable
+		for (i = 0; i<max; i++) {	
 			if(null != replaceConfigVars[replaceConfig[i][1]]){
 				continue;
 			}
 			replaceConfigOdered.push(replaceConfig[i])
 		}		 
 		
-		replaceConfigOdered = replaceConfigOdered.sort(function(a,b){return b[1].length - a[1].length}) // make sure the longest vars gets replaced first
+		// make sure the longest vars gets replaced first
+		replaceConfigOdered = replaceConfigOdered.sort(function(a,b){return b[1].length - a[1].length}) 
 		
+		// Do the replace
 		for (i = 0; i<max; i++) { 	
 			var re = new RegExp("\\"+replaceConfigOdered[i][1],"gi");
 			s = s.replace(re, replaceConfigOdered[i][2])
 		}
 
 		// Expand chuncs
+		// a -- {{b,c}} -> d
+		// equals
+		// a -- b -> d
+		// a -- c -> d
 		regexp = /(.*?){{(.*?),(.*?)}}(.*)$/gim;
 		while(s.match(regexp)){
 			//s = s.replace(regexp, "'$1' '$2' '$3' '$4'")
