@@ -188,7 +188,7 @@
 		// Last value set to same constant will be the valid one
 		// The line "   ; $ hello yo = some crap code " will replace "$ hello yo" with "some crap code"
 		var regexp  = /\s*?;\s*?(\$.+?)\s*=\s*(.*?)\s*$/gm;
-		var regexp2 = /\s*?;\s*?(\$.+?)\s*=\s*(.*?)\s*$/;   //same but no global nor multiline. Could be more elegant...
+		var regexp2 = /(\s*?;\s*?(\$.+?)\s*=\s*(.*?)\s*$)/;   //same but no global nor multiline. Could be more elegant...
 		var replaceConfigLines = s.match(regexp)
 		var max = 0;
 		if(null !== replaceConfigLines){
@@ -201,28 +201,22 @@
 			replaceConfig.push(replaceConfigLines[i].match(regexp2));
 		}
 		
-		//only latest setting of each variable
-		for (i = 0; i<max; i++) {	
+		for (i = 0; i<max; i++) {	//only latest setting of each variable
 			if(null != replaceConfigVars[replaceConfig[i][1]]){
 				continue;
 			}
 			replaceConfigOdered.push(replaceConfig[i])
 		}		 
 		
-		// make sure the longest vars gets replaced first
-		replaceConfigOdered = replaceConfigOdered.sort(function(a,b){return b[1].length - a[1].length}) 
+		replaceConfigOdered = replaceConfigOdered.sort(function(a,b){return b[1].length - a[1].length}) // make sure the longest vars gets replaced first
 		
-		// Do the replace
 		for (i = 0; i<max; i++) { 	
-			var re = new RegExp("\\"+replaceConfigOdered[i][1],"gi");
-			s = s.replace(re, replaceConfigOdered[i][2])
+			var re = new RegExp("\\"+replaceConfigOdered[i][2],"gi");
+			s = s.replace(replaceConfigOdered[i][1], "")
+			s = s.replace(re, replaceConfigOdered[i][3].replace("\\n","\n"))
 		}
 
 		// Expand chuncs
-		// a -- {{b,c}} -> d
-		// equals
-		// a -- b -> d
-		// a -- c -> d
 		regexp = /(.*?){{(.*?),(.*?)}}(.*)$/gim;
 		while(s.match(regexp)){
 			//s = s.replace(regexp, "'$1' '$2' '$3' '$4'")
@@ -241,7 +235,31 @@
 			s = s.replace(regexp, "$1$2\n$2$3$4")
 		}
 		
-		//alert(s)
+		var elements = s.split(/-[->]|\n/);
+		for(x in elements){
+		
+			if(!elements[x].match(/¤/) || -1 == elements[x].indexOf('¤', elements[x].indexOf(';'))){
+				continue;
+			}
+			var data = elements[x].split(/(.*)(¤)(.*)/)
+			//s += "\n"+data[1]+data[2]+data[3]+"{label:"+data[1]+"}\n"
+			var re = new RegExp("(^.*?"+data[1]+data[2]+data[3]+".*$)","gm");
+			s = s.replace(re, "$1\n"+data[1]+data[2]+data[3]+"{label:"+data[1]+"}\n");
+		}
+		
+		// bug when only displaying one element - so we add two...
+		var newArray = new Array();
+		for(var i = 0; i<elements.length; i++){
+			if (elements[i]){
+				newArray.push(elements[i]);
+			}
+		}
+
+		if(1>=newArray.length){
+			s = "{color:lightgray}\n"+s+"\n->{color: #000 , weight:3}\n{color:#CC0323, shape:dot}\nPlease add -> more text \n"
+		}
+		
+		// alert(s)
 
 		return s;
     }
